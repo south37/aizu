@@ -8,35 +8,53 @@ using namespace std;
 string T;
 string P;
 
-bool isEqual(int s1, int l1, int s2, int l2) {
-  // Check length;
-  if ((l2 - s2) > (l1 - s1)) {
-    return false;
-  }
-  while (s2 <= l2) {
-    if (T[s1] != P[s2]) {
-      return false;
+#define MAX_DIS 256
+int dis[MAX_DIS];
+
+int bm(int i) {
+  for (int j = 0; j < P.size(); ++j) {
+    // NOTE: for debug
+    // cout << "compare " << T[i - j] << " and " << P[P.size() - 1 - j] << endl;
+
+    if (T[i - j] != P[P.size() - 1 - j]) {
+      // NOTE: update i
+      return max(dis[T[i - j]] - j, 1);
     }
-    ++s1;
-    ++s2;
   }
-  return true;
+  return 0;  // means `find`
 }
 
 int main(int argc, char** argv) {
   cin >> T;
   cin >> P;
 
+  for (int i = 0; i < MAX_DIS; ++i) {
+    dis[i] = P.size();
+  }
+  for (int i = 0; i < P.size(); ++i) {
+    dis[P[i]] = P.size() - 1 - i;
+  }
+  // NOTE: for debug
+  // cout << "dis['a']=" << dis['a'] << endl;
+  // cout << "dis['b']=" << dis['b'] << endl;
+
   vector<int> r;
-  int i = 0;
-  for(int i = 0; i < T.size(); ++i) {
-    if (isEqual(i, T.size() - 1, 0, P.size() - 1)) {
-      r.push_back(i);
+  int i = P.size() - 1;
+  while (i < T.size()) {
+    // NOTE: for debug
+    // cout << "try " << i << endl;
+
+    int d = bm(i);
+    if (d == 0) { // find
+      r.push_back(i - (P.size() - 1));
+      ++i;
+    } else {
+      i += d;
     }
   }
 
-  for(auto it = r.begin(); it != r.end(); ++it) {
-    cout << *it << endl;
+  for (int i = 0; i < r.size(); ++i) {
+    cout << r[i] << endl;
   }
 
   // NOTE: Only for debug
